@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Service - GiveTake{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Edit Service</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('edit_service', service_id=service.id) }}" class="needs-validation" novalidate>
+                    <!-- Service Title -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Service Title</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="title" 
+                               name="title" 
+                               required 
+                               minlength="5" 
+                               maxlength="100"
+                               value="{{ service.title }}"
+                               placeholder="E.g., Web Development, Mobile App Design">
+                        <div class="invalid-feedback">
+                            Please provide a title (5-100 characters).
+                        </div>
+                    </div>
+
+                    <!-- Service Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" 
+                                  id="description" 
+                                  name="description" 
+                                  rows="4" 
+                                  required 
+                                  minlength="20"
+                                  placeholder="Describe the service you're offering in detail...">{{ service.description }}</textarea>
+                        <div class="invalid-feedback">
+                            Please provide a detailed description (minimum 20 characters).
+                        </div>
+                    </div>
+
+                    <!-- Required Skill -->
+                    <div class="mb-3">
+                        <label for="skill_required" class="form-label">Required Skill in Exchange</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="skill_required" 
+                               name="skill_required" 
+                               required
+                               value="{{ service.skill_required }}"
+                               placeholder="E.g., Python Programming, UI/UX Design">
+                        <div class="invalid-feedback">
+                            Please specify the skill you're looking for in exchange.
+                        </div>
+                    </div>
+
+                    <!-- Service Status -->
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Service Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="available" {% if service.status == 'available' %}selected{% endif %}>Available</option>
+                            <option value="unavailable" {% if service.status == 'unavailable' %}selected{% endif %}>Unavailable</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a status.
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}
