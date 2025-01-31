@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Create Service - GiveTake{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Create New Service</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('create_service') }}" class="needs-validation" novalidate>
+                    <!-- Service Title -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Service Title</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="title" 
+                               name="title" 
+                               required 
+                               minlength="5" 
+                               maxlength="100"
+                               placeholder="E.g., Web Development, Mobile App Design">
+                        <div class="invalid-feedback">
+                            Please provide a title (5-100 characters).
+                        </div>
+                    </div>
+
+                    <!-- Service Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" 
+                                  id="description" 
+                                  name="description" 
+                                  rows="4" 
+                                  required 
+                                  minlength="20"
+                                  placeholder="Describe the service you're offering in detail..."></textarea>
+                        <div class="invalid-feedback">
+                            Please provide a detailed description (minimum 20 characters).
+                        </div>
+                    </div>
+
+                    <!-- Required Skill -->
+                    <div class="mb-3">
+                        <label for="skill_required" class="form-label">Required Skill in Exchange</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="skill_required" 
+                               name="skill_required" 
+                               required
+                               placeholder="E.g., Python Programming, UI/UX Design">
+                        <div class="invalid-feedback">
+                            Please specify the skill you're looking for in exchange.
+                        </div>
+                    </div>
+
+                    <!-- Estimated Duration -->
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Estimated Duration</label>
+                        <select class="form-select" id="duration" name="duration" required>
+                            <option value="">Select duration...</option>
+                            <option value="1-3 days">1-3 days</option>
+                            <option value="1 week">1 week</option>
+                            <option value="2 weeks">2 weeks</option>
+                            <option value="1 month">1 month</option>
+                            <option value="custom">Custom duration</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select an estimated duration.
+                        </div>
+                    </div>
+
+                    <!-- Custom Duration (shown when custom is selected) -->
+                    <div class="mb-3" id="customDurationDiv" style="display: none;">
+                        <label for="custom_duration" class="form-label">Specify Custom Duration</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="custom_duration" 
+                               name="custom_duration"
+                               placeholder="E.g., 6 weeks">
+                    </div>
+
+                    <!-- Terms Checkbox -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="terms" 
+                               required>
+                        <label class="form-check-label" for="terms">
+                            I understand that this service will be exchanged for another skill, not money
+                        </label>
+                        <div class="invalid-feedback">
+                            You must agree to the terms.
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create Service</button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Handle custom duration visibility
+document.getElementById('duration').addEventListener('change', function() {
+    const customDurationDiv = document.getElementById('customDurationDiv');
+    if (this.value === 'custom') {
+        customDurationDiv.style.display = 'block';
+        document.getElementById('custom_duration').required = true;
+    } else {
+        customDurationDiv.style.display = 'none';
+        document.getElementById('custom_duration').required = false;
+    }
+});
+</script>
+{% endblock %}
