@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Login - GiveTake{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Login to GiveTake</h3>
+            </div>
+            <div class="card-body">
+                <!-- Login Form -->
+                <form method="POST" action="{{ url_for('login') }}">
+                    <!-- Username Field -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="username" 
+                               name="username" 
+                               required 
+                               autofocus>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               required>
+                    </div>
+
+                    <!-- Remember Me Checkbox -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="remember" 
+                               name="remember">
+                        <label class="form-check-label" for="remember">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+
+                <!-- Registration and Password Reset Links -->
+                <div class="text-center mt-3">
+                    <p class="mb-1">
+                        New to GiveTake? <a href="{{ url_for('register') }}">Register here</a>
+                    </p>
+                    <p class="mb-0">
+                        <small>
+                            <a href="#" class="text-muted">Forgot your password?</a>
+                        </small>
+                    </p>
+                </div>
+
+                <!-- Social Login Divider -->
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        <span class="px-3">Or login with</span>
+                    </p>
+                    <!-- Social Login Buttons -->
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                        <button class="btn btn-outline-dark" type="button" disabled>
+                            <i class="fab fa-github me-2"></i>GitHub
+                        </button>
+                        <button class="btn btn-outline-primary" type="button" disabled>
+                            <i class="fab fa-linkedin me-2"></i>LinkedIn
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Login Help Modal -->
+<div class="modal fade" id="loginHelpModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Login Help</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Having trouble logging in?</h6>
+                <ul>
+                    <li>Make sure your username is spelled correctly</li>
+                    <li>Passwords are case-sensitive</li>
+                    <li>Check if your caps lock is on</li>
+                    <li>Try resetting your password if you've forgotten it</li>
+                </ul>
+                <p>For additional help, contact support.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add any login-specific JavaScript here
+document.addEventListener('DOMContentLoaded', function() {
+    // Focus username field on page load
+    document.getElementById('username').focus();
+});
+</script>
+{% endblock %}
