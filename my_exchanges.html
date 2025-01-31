@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}My Exchanges - GiveTake{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Exchanges Overview -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2>My Exchanges</h2>
+            <p class="lead">Manage your service exchanges and track their progress</p>
+        </div>
+    </div>
+
+    <!-- Tabs for Different Exchange Types -->
+    <ul class="nav nav-tabs mb-4" id="exchangesTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="provided-tab" data-bs-toggle="tab" 
+                    data-bs-target="#provided" type="button" role="tab">
+                Services I'm Providing
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="requested-tab" data-bs-toggle="tab" 
+                    data-bs-target="#requested" type="button" role="tab">
+                Services I've Requested
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="exchangesTabContent">
+        <!-- Services I'm Providing -->
+        <div class="tab-pane fade show active" id="provided" role="tabpanel">
+            {% if provided_exchanges %}
+                {% for exchange in provided_exchanges %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="card-title">{{ exchange.service.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    Requested by: {{ exchange.requester.username }}
+                                </h6>
+                                <p class="card-text">{{ exchange.service.description }}</p>
+                                <div class="mb-2">
+                                    <span class="badge bg-info">Status: {{ exchange.status }}</span>
+                                    <span class="badge bg-secondary">Escrow: ${{ exchange.escrow_amount }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% if exchange.status == 'pending' %}
+                                    <button class="btn btn-success btn-sm mb-2" 
+                                            onclick="acceptExchange({{ exchange.id }})">
+                                        Accept
+                                    </button>
+                                    <button class="btn btn-danger btn-sm mb-2"
+                                            onclick="declineExchange({{ exchange.id }})">
+                                        Decline
+                                    </button>
+                                {% elif exchange.status == 'in_progress' %}
+                                    <button class="btn btn-primary btn-sm mb-2"
+                                            onclick="completeExchange({{ exchange.id }})">
+                                        Mark Complete
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    You're not providing any services yet. 
+                    <a href="{{ url_for('create_service') }}">Create a service</a> to get started!
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Services I've Requested -->
+        <div class="tab-pane fade" id="requested" role="tabpanel">
+            {% if requested_exchanges %}
+                {% for exchange in requested_exchanges %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="card-title">{{ exchange.service.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    Provided by: {{ exchange.provider.username }}
+                                </h6>
+                                <p class="card-text">{{ exchange.service.description }}</p>
+                                <div class="mb-2">
+                                    <span class="badge bg-info">Status: {{ exchange.status }}</span>
+                                    <span class="badge bg-secondary">Escrow: ${{ exchange.escrow_amount }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% if exchange.status == 'completed_by_provider' %}
+                                    <button class="btn btn-success btn-sm mb-2"
+                                            onclick="confirmCompletion({{ exchange.id }})">
+                                        Confirm Completion
+                                    </button>
+                                {% elif exchange.status == 'in_progress' %}
+                                    <button class="btn btn-warning btn-sm mb-2"
+                                            onclick="reportIssue({{ exchange.id }})">
+                                        Report Issue
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    You haven't requested any services yet. 
+                    <a href="{{ url_for('index') }}">Browse available services</a>!
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to proceed with this action?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Exchange management functions
+function acceptExchange(exchangeId) {
+    if (confirm('Are you sure you want to accept this exchange?')) {
+        // Send POST request to accept endpoint
+        fetch(`/accept_exchange/${exchangeId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => window.location.reload());
+    }
+}
+
+function declineExchange(exchangeId) {
+    if (confirm('Are you sure you want to decline this exchange?')) {
+        // Send POST request to decline endpoint
+        fetch(`/decline_exchange/${exchangeId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => window.location.reload());
+    }
+}
+
+function completeExchange(exchangeId) {
+    if (confirm('Are you sure you want to mark this exchange as complete?')) {
+        // Send POST request to complete endpoint
+        fetch(`/complete_exchange/${exchangeId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => window.location.reload());
+    }
+}
+
+function confirmCompletion(exchangeId) {
+    if (confirm('Are you sure you want to confirm the completion of this exchange?')) {
+        // Send POST request to confirm completion endpoint
+        fetch(`/confirm_completion/${exchangeId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => window.location.reload());
+    }
+}
+
+function reportIssue(exchangeId) {
+    // Redirect to issue reporting page
+    window.location.href = `/report_issue/${exchangeId}`;
+}
+</script>
+{% endblock %}
