@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}GiveTake - Available Services{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Available Services</h1>
+        <p class="lead">Exchange your skills with other developers - no money needed!</p>
+    </div>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <form class="d-flex" method="GET">
+            <input class="form-control me-2" type="search" name="search" 
+                   placeholder="Search services..." value="{{ request.args.get('search', '') }}">
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+
+<!-- Services Grid -->
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for service in services %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ service.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    Offered by: {{ service.provider.username }}
+                </h6>
+                <p class="card-text">{{ service.description }}</p>
+                <div class="mb-2">
+                    <span class="badge bg-primary">Skill Required: {{ service.skill_required }}</span>
+                </div>
+                <p class="card-text">
+                    <small class="text-muted">
+                        Posted: {{ service.created_at.strftime('%Y-%m-%d') }}
+                    </small>
+                </p>
+            </div>
+            <div class="card-footer">
+                {% if current_user.is_authenticated and current_user.id != service.provider_id %}
+                    <form action="{{ url_for('request_exchange', service_id=service.id) }}" method="POST">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            Request Exchange
+                        </button>
+                    </form>
+                {% elif not current_user.is_authenticated %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-sm">
+                        Login to Request Exchange
+                    </a>
+                {% elif current_user.id == service.provider_id %}
+                    <button class="btn btn-secondary btn-sm" disabled>Your Service</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No services available at the moment. 
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('create_service') }}">Create one!</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a> to create a service.
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Create Service Button -->
+{% if current_user.is_authenticated %}
+<div class="row mt-4">
+    <div class="col text-center">
+        <a href="{{ url_for('create_service') }}" class="btn btn-success btn-lg">
+            <i class="fas fa-plus-circle"></i> Create New Service
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
